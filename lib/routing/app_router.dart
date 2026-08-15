@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
@@ -11,6 +12,7 @@ import '../features/onboarding/cubit/onboarding_cubit.dart';
 import '../features/onboarding/onboarding_screen.dart';
 import '../features/profile/profile_screen.dart';
 import '../features/scan/scan_screen.dart';
+import '../theme/breakpoints.dart';
 import '../theme/colors.dart';
 import '../theme/typography.dart';
 import 'route_paths.dart';
@@ -111,6 +113,60 @@ class _AppShell extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDesktop = kIsWeb && MediaQuery.sizeOf(context).width >= AppBreakpoints.desktop;
+    if (isDesktop) {
+      return Scaffold(
+        body: Row(
+          children: [
+            NavigationRail(
+              backgroundColor: AppColors.navyPanel,
+              minWidth: 88,
+              labelType: NavigationRailLabelType.all,
+              indicatorColor: AppColors.gold.withValues(alpha: 0.18),
+              selectedLabelTextStyle: AppTypography.body(
+                fontSize: 12,
+                fontWeight: FontWeight.w700,
+                color: AppColors.gold,
+              ),
+              unselectedLabelTextStyle: AppTypography.body(
+                fontSize: 12,
+                fontWeight: FontWeight.w700,
+                color: AppColors.creamDim,
+              ),
+              selectedIndex: navigationShell.currentIndex,
+              onDestinationSelected: (index) => navigationShell.goBranch(
+                index,
+                initialLocation: index == navigationShell.currentIndex,
+              ),
+              destinations: const [
+                NavigationRailDestination(
+                  icon: Icon(Icons.home_outlined, color: AppColors.creamDim),
+                  selectedIcon: Icon(Icons.home_outlined, color: AppColors.gold),
+                  label: Text('Home'),
+                ),
+                NavigationRailDestination(
+                  icon: Icon(Icons.menu_book_outlined, color: AppColors.creamDim),
+                  selectedIcon: Icon(Icons.menu_book_outlined, color: AppColors.gold),
+                  label: Text('Journals'),
+                ),
+                NavigationRailDestination(
+                  icon: Icon(Icons.leaderboard_outlined, color: AppColors.creamDim),
+                  selectedIcon: Icon(Icons.leaderboard_outlined, color: AppColors.gold),
+                  label: Text('Leaderboard'),
+                ),
+                NavigationRailDestination(
+                  icon: Icon(Icons.person_outline, color: AppColors.creamDim),
+                  selectedIcon: Icon(Icons.person_outline, color: AppColors.gold),
+                  label: Text('Profile'),
+                ),
+              ],
+            ),
+            const VerticalDivider(width: 1, color: AppColors.navyDeep),
+            Expanded(child: navigationShell),
+          ],
+        ),
+      );
+    }
     return Scaffold(
       body: navigationShell,
       bottomNavigationBar: NavigationBar(

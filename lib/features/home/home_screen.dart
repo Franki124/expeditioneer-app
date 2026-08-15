@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -7,6 +8,7 @@ import '../../core/widgets/diamond_marker.dart';
 import '../../core/widgets/in_app_banner.dart';
 import '../../core/widgets/motion.dart';
 import '../../routing/route_paths.dart';
+import '../../theme/breakpoints.dart';
 import '../../theme/colors.dart';
 import '../../theme/spacing.dart';
 import '../../theme/typography.dart';
@@ -156,17 +158,20 @@ class _JoinedEventSectionState extends State<_JoinedEventSection> {
               builder: (context, participantSnapshot) {
                 _handleParticipantUpdate(participantSnapshot.data);
                 final collected = participantSnapshot.data?.collectedCount ?? 0;
+                final isDesktopWeb = kIsWeb && MediaQuery.sizeOf(context).width >= AppBreakpoints.desktop;
                 return Padding(
                   padding: const EdgeInsets.only(bottom: AppSpacing.md20),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       JoinedEventCard(event: event, collectedCount: collected),
-                      const SizedBox(height: AppSpacing.sm12),
-                      AppButton(
-                        label: 'Scan a QR code',
-                        onPressed: event.isLive ? () => context.push(RoutePaths.scan) : null,
-                      ),
+                      if (!isDesktopWeb) ...[
+                        const SizedBox(height: AppSpacing.sm12),
+                        AppButton(
+                          label: 'Scan a QR code',
+                          onPressed: event.isLive ? () => context.push(RoutePaths.scan) : null,
+                        ),
+                      ],
                     ],
                   ),
                 );

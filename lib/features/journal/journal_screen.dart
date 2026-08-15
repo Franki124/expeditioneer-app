@@ -198,17 +198,22 @@ class _QuestSection extends StatelessWidget {
         const SizedBox(height: AppSpacing.xs8),
         const FadingDivider(),
         const SizedBox(height: AppSpacing.sm12),
-        GridView.builder(
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          itemCount: journals.length,
-          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 2,
-            mainAxisSpacing: AppSpacing.sm12,
-            crossAxisSpacing: AppSpacing.sm12,
-            childAspectRatio: 1,
-          ),
-          itemBuilder: (context, index) => buildCard(journals[index]),
+        LayoutBuilder(
+          builder: (context, constraints) {
+            final crossAxisCount = constraints.maxWidth >= 520 ? 3 : 2;
+            return GridView.builder(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              itemCount: journals.length,
+              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: crossAxisCount,
+                mainAxisSpacing: AppSpacing.sm12,
+                crossAxisSpacing: AppSpacing.sm12,
+                childAspectRatio: 1,
+              ),
+              itemBuilder: (context, index) => buildCard(journals[index]),
+            );
+          },
         ),
         const SizedBox(height: AppSpacing.md20),
       ],

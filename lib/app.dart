@@ -15,11 +15,8 @@ import 'features/onboarding/cubit/onboarding_cubit.dart';
 import 'routing/app_router.dart';
 import 'theme/app_scroll_behavior.dart';
 import 'theme/app_theme.dart';
+import 'theme/breakpoints.dart';
 import 'theme/colors.dart';
-
-/// The design is mobile-first; on web this keeps the layout at a phone-like
-/// width instead of stretching it across a wide browser window.
-const _webMaxWidth = 480.0;
 
 class ExpeditioneerApp extends StatefulWidget {
   const ExpeditioneerApp({super.key});
@@ -96,11 +93,15 @@ class _ExpeditioneerAppState extends State<ExpeditioneerApp> {
               ],
             );
             if (!kIsWeb) return content;
+            final isDesktop = MediaQuery.sizeOf(context).width >= AppBreakpoints.desktop;
+            final maxWidth = isDesktop
+                ? AppBreakpoints.desktopContentMaxWidth
+                : AppBreakpoints.mobileContentMaxWidth;
             return ColoredBox(
               color: AppColors.navyDeep,
               child: Center(
                 child: ConstrainedBox(
-                  constraints: const BoxConstraints(maxWidth: _webMaxWidth),
+                  constraints: BoxConstraints(maxWidth: maxWidth),
                   child: content,
                 ),
               ),

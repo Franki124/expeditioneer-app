@@ -1,5 +1,7 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
+import '../../theme/breakpoints.dart';
 import '../../theme/colors.dart';
 import '../../theme/radii.dart';
 import '../../theme/typography.dart';
@@ -46,19 +48,25 @@ class AppButton extends StatelessWidget {
         fillColor = Colors.transparent;
     }
 
+    final isDesktopWeb = kIsWeb && MediaQuery.sizeOf(context).width >= AppBreakpoints.desktop;
     return Material(
       color: fillColor,
       shape: RoundedRectangleBorder(borderRadius: AppRadii.button, side: BorderSide(color: borderColor)),
       child: InkWell(
         borderRadius: AppRadii.button,
         onTap: disabled ? null : onPressed,
-        child: Container(
-          width: expand ? double.infinity : null,
-          padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 24),
-          alignment: Alignment.center,
-          child: loading
-              ? SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2, color: textColor))
-              : Text(label, style: AppTypography.label(fontSize: 16, color: textColor)),
+        child: ConstrainedBox(
+          constraints: BoxConstraints(
+            maxWidth: expand && isDesktopWeb ? AppBreakpoints.buttonMaxWidth : double.infinity,
+          ),
+          child: Container(
+            width: expand ? double.infinity : null,
+            padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 24),
+            alignment: Alignment.center,
+            child: loading
+                ? SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2, color: textColor))
+                : Text(label, style: AppTypography.label(fontSize: 16, color: textColor)),
+          ),
         ),
       ),
     );

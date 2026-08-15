@@ -3,6 +3,7 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 
 import '../../features/events/domain/journal.dart';
+import '../../theme/breakpoints.dart';
 import '../../theme/colors.dart';
 import '../../theme/spacing.dart';
 import '../../theme/typography.dart';
@@ -70,7 +71,10 @@ class _RevealModalState extends State<RevealModal> with SingleTickerProviderStat
           );
         },
         child: ConstrainedBox(
-          constraints: BoxConstraints(maxHeight: MediaQuery.sizeOf(context).height * 0.85),
+          constraints: BoxConstraints(
+            maxHeight: MediaQuery.sizeOf(context).height * 0.85,
+            maxWidth: AppBreakpoints.dialogMaxWidth,
+          ),
           child: CornerFrame(
             padding: const EdgeInsets.all(AppSpacing.md20),
             child: SingleChildScrollView(
@@ -79,10 +83,9 @@ class _RevealModalState extends State<RevealModal> with SingleTickerProviderStat
                 children: [
                   // Aspect-ratio'd instead of a fixed pixel height, so the
                   // art scales with whatever width the dialog actually
-                  // gets on a given device (native-mobile full width vs.
-                  // the 480px web letterbox) rather than looking
-                  // over/under-sized on screens the fixed height wasn't
-                  // tuned for.
+                  // gets (native-mobile full width vs. the web letterbox's
+                  // dialogMaxWidth cap) rather than looking over/under-sized
+                  // on screens the fixed height wasn't tuned for.
                   AspectRatio(
                     aspectRatio: 4 / 3,
                     child: widget.journal.artUrl.isEmpty

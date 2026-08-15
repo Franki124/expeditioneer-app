@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -5,6 +6,7 @@ import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 import '../../core/widgets/motion.dart';
+import '../../theme/breakpoints.dart';
 import '../../theme/colors.dart';
 import '../../theme/spacing.dart';
 import '../../theme/typography.dart';
@@ -112,22 +114,29 @@ class _ScanScreenState extends State<ScanScreen> {
                             textAlign: TextAlign.center,
                           )
                         else ...[
-                          AspectRatio(
-                            aspectRatio: 1,
-                            child: ClipRect(
-                              child: Stack(
-                                fit: StackFit.expand,
-                                children: [
-                                  MobileScanner(
-                                    controller: _controller,
-                                    onDetect: (capture) => _handleDetection(capture, eventId, uid, uncollected),
-                                    errorBuilder: (context, error) => CameraAccessOffScreen(
-                                      onOpenSettings: () => openAppSettings(),
-                                      onTryAgain: () => _controller.start(),
+                          ConstrainedBox(
+                            constraints: BoxConstraints(
+                              maxWidth: kIsWeb && MediaQuery.sizeOf(context).width >= AppBreakpoints.desktop
+                                  ? AppBreakpoints.scanViewfinderMaxWidth
+                                  : double.infinity,
+                            ),
+                            child: AspectRatio(
+                              aspectRatio: 1,
+                              child: ClipRect(
+                                child: Stack(
+                                  fit: StackFit.expand,
+                                  children: [
+                                    MobileScanner(
+                                      controller: _controller,
+                                      onDetect: (capture) => _handleDetection(capture, eventId, uid, uncollected),
+                                      errorBuilder: (context, error) => CameraAccessOffScreen(
+                                        onOpenSettings: () => openAppSettings(),
+                                        onTryAgain: () => _controller.start(),
+                                      ),
                                     ),
-                                  ),
-                                  const Viewfinder(),
-                                ],
+                                    const Viewfinder(),
+                                  ],
+                                ),
                               ),
                             ),
                           ),
