@@ -1,0 +1,41 @@
+{
+  "hosting": {
+    "public": "build/web",
+    "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
+    "rewrites": [
+      {
+        "source": "**",
+        "destination": "/index.html"
+      }
+    ]
+  },
+  "flutter": {
+    "platforms": {
+      "android": {
+        "default": {
+          "projectId": "expeditioner-39b43",
+          "appId": "1:574980220198:android:0b22c372ffa2e1e60e4de7",
+          "fileOutput": "android/app/google-services.json"
+        }
+      },
+      "ios": {
+        "default": {
+          "projectId": "expeditioner-39b43",
+          "appId": "1:574980220198:ios:e64b991cc3a7d03f0e4de7",
+          "uploadDebugSymbols": false,
+          "fileOutput": "ios/Runner/GoogleService-Info.plist"
+        }
+      },
+      "dart": {
+        "lib/firebase_options.dart": {
+          "projectId": "expeditioner-39b43",
+          "configurations": {
+            "android": "1:574980220198:android:0b22c372ffa2e1e60e4de7",
+            "ios": "1:574980220198:ios:e64b991cc3a7d03f0e4de7",
+            "web": "1:574980220198:web:ca70a6ba6b7e78680e4de7"
+          }
+        }
+      }
+    }
+  }
+}
