@@ -409,11 +409,14 @@ class _QuestionPageState extends State<_QuestionPage> {
           if (question.imageUrl.isNotEmpty) ...[
             AspectRatio(
               aspectRatio: 4 / 3,
-              child: Image.network(
-                cloudinaryDeliveryUrl(question.imageUrl),
-                width: double.infinity,
-                fit: BoxFit.cover,
-                errorBuilder: (context, error, stackTrace) => Container(color: AppColors.navyPanel),
+              child: ColoredBox(
+                color: AppColors.navyPanel,
+                child: Image.network(
+                  cloudinaryDeliveryUrl(question.imageUrl),
+                  width: double.infinity,
+                  fit: BoxFit.contain,
+                  errorBuilder: (context, error, stackTrace) => Container(color: AppColors.navyPanel),
+                ),
               ),
             ),
             const SizedBox(height: AppSpacing.sm12),

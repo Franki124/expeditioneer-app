@@ -111,11 +111,14 @@ class _ReviewQuestionCard extends StatelessWidget {
           if (question.imageUrl.isNotEmpty) ...[
             AspectRatio(
               aspectRatio: 4 / 3,
-              child: Image.network(
-                cloudinaryDeliveryUrl(question.imageUrl),
-                width: double.infinity,
-                fit: BoxFit.cover,
-                errorBuilder: (context, error, stackTrace) => Container(color: AppColors.navyPanel2),
+              child: ColoredBox(
+                color: AppColors.navyPanel2,
+                child: Image.network(
+                  cloudinaryDeliveryUrl(question.imageUrl),
+                  width: double.infinity,
+                  fit: BoxFit.contain,
+                  errorBuilder: (context, error, stackTrace) => Container(color: AppColors.navyPanel2),
+                ),
               ),
             ),
             const SizedBox(height: AppSpacing.sm12),

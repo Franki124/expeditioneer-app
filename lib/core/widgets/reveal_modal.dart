@@ -90,13 +90,16 @@ class _RevealModalState extends State<RevealModal> with SingleTickerProviderStat
                     aspectRatio: 4 / 3,
                     child: widget.journal.artUrl.isEmpty
                         ? _ArtPlaceholder(tag: tag)
-                        : Image.network(
-                            cloudinaryDeliveryUrl(widget.journal.artUrl),
-                            width: double.infinity,
-                            fit: BoxFit.cover,
-                            errorBuilder: (context, error, stackTrace) => _ArtPlaceholder(tag: tag),
-                            loadingBuilder: (context, child, progress) =>
-                                progress == null ? child : _ArtPlaceholder(tag: tag),
+                        : ColoredBox(
+                            color: AppColors.navyPanel,
+                            child: Image.network(
+                              cloudinaryDeliveryUrl(widget.journal.artUrl),
+                              width: double.infinity,
+                              fit: BoxFit.contain,
+                              errorBuilder: (context, error, stackTrace) => _ArtPlaceholder(tag: tag),
+                              loadingBuilder: (context, child, progress) =>
+                                  progress == null ? child : _ArtPlaceholder(tag: tag),
+                            ),
                           ),
                   ),
                   const SizedBox(height: AppSpacing.sm12),
