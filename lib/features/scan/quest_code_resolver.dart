@@ -15,6 +15,44 @@ Journal? findMatchingJournal(String raw, List<Journal> uncollected) {
   return null;
 }
 
+/// How a scanned code relates to the joined event's quests.
+enum ScannedCodeKind {
+  /// Matches a quest the player hasn't collected yet.
+  newQuest,
+
+  /// Matches a quest the player has already collected.
+  alreadyFound,
+
+  /// Matches nothing at this event — a QR from somewhere else entirely, or
+  /// another event's marker.
+  unknown,
+}
+
+class ScannedCodeMatch {
+  const ScannedCodeMatch(this.kind, [this.journal]);
+
+  final ScannedCodeKind kind;
+
+  /// The matched quest; null when [kind] is [ScannedCodeKind.unknown].
+  final Journal? journal;
+}
+
+/// Classifies [raw] against every quest at the event, so the scan screen can
+/// tell "not part of the game" apart from "you've already found this one".
+ScannedCodeMatch classifyScannedCode(
+  String raw, {
+  required List<Journal> journals,
+  required Set<String> collectedIds,
+}) {
+  for (final journal in journals) {
+    if (!journal.matchesManualCode(raw)) continue;
+    return collectedIds.contains(journal.id)
+        ? ScannedCodeMatch(ScannedCodeKind.alreadyFound, journal)
+        : ScannedCodeMatch(ScannedCodeKind.newQuest, journal);
+  }
+  return const ScannedCodeMatch(ScannedCodeKind.unknown);
+}
+
 /// What happened after handing a matched [Journal] to [completeQuestFind] —
 /// callers use this to decide their own follow-up navigation (e.g. whether
 /// to pop their own screen).
