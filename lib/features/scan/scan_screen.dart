@@ -20,6 +20,7 @@ import '../events/domain/journal.dart';
 import '../events/widgets/manual_code_entry.dart';
 import 'quest_code_resolver.dart';
 import 'widgets/camera_access_off_screen.dart';
+import 'widgets/stray_marker_modal.dart';
 import 'widgets/viewfinder.dart';
 
 class ScanScreen extends StatefulWidget {
@@ -33,19 +34,37 @@ class _ScanScreenState extends State<ScanScreen> {
   final _controller = MobileScannerController(formats: [BarcodeFormat.qrCode]);
   bool _scanning = false;
 
+  /// The last code that opened [StrayMarkerModal], and when it was closed.
+  /// The camera keeps reading the same sticker after the dialog closes, so
+  /// that code is ignored for a moment instead of reopening the dialog.
+  String? _strayCode;
+  DateTime? _strayClosedAt;
+  static const _strayCooldown = Duration(seconds: 4);
+
   @override
   void dispose() {
     _controller.dispose();
     super.dispose();
   }
 
-  Future<void> _handleDetection(BarcodeCapture capture, String eventId, String uid, List<Journal> uncollected) async {
+  Future<void> _handleDetection(
+    BarcodeCapture capture,
+    String eventId,
+    String uid,
+    List<Journal> journals,
+    Set<String> collectedIds,
+  ) async {
     if (_scanning) return;
     final barcodes = capture.barcodes;
     final raw = barcodes.isEmpty ? null : barcodes.first.rawValue;
     if (raw == null || raw.isEmpty) return;
-    final journal = findMatchingJournal(raw, uncollected);
-    if (journal == null) return; // unrecognized code in frame — keep scanning silently
+
+    final match = classifyScannedCode(raw, journals: journals, collectedIds: collectedIds);
+    final journal = match.journal;
+    if (match.kind != ScannedCodeKind.newQuest || journal == null) {
+      await _showStrayMarker(raw, alreadyFoundTitle: journal?.title);
+      return;
+    }
 
     setState(() => _scanning = true);
     final outcome = await completeQuestFind(context: context, eventId: eventId, uid: uid, journal: journal);
@@ -59,6 +78,23 @@ class _ScanScreenState extends State<ScanScreen> {
       return;
     }
     setState(() => _scanning = false);
+  }
+
+  Future<void> _showStrayMarker(String raw, {String? alreadyFoundTitle}) async {
+    final closedAt = _strayClosedAt;
+    if (raw == _strayCode && closedAt != null && DateTime.now().difference(closedAt) < _strayCooldown) return;
+
+    setState(() => _scanning = true);
+    _strayCode = raw;
+    await showDialog<void>(
+      context: context,
+      builder: (dialogContext) => StrayMarkerModal(
+        alreadyFoundTitle: alreadyFoundTitle,
+        onClose: () => Navigator.of(dialogContext).pop(),
+      ),
+    );
+    _strayClosedAt = DateTime.now();
+    if (mounted) setState(() => _scanning = false);
   }
 
   @override
@@ -128,7 +164,8 @@ class _ScanScreenState extends State<ScanScreen> {
                                   children: [
                                     MobileScanner(
                                       controller: _controller,
-                                      onDetect: (capture) => _handleDetection(capture, eventId, uid, uncollected),
+                                      onDetect: (capture) =>
+                                          _handleDetection(capture, eventId, uid, journals, collected),
                                       errorBuilder: (context, error) => CameraAccessOffScreen(
                                         onOpenSettings: () => openAppSettings(),
                                         onTryAgain: () => _controller.start(),

@@ -55,7 +55,7 @@ class _ManualCodeDialogState extends State<_ManualCodeDialog> {
     }
     final journal = findMatchingJournal(raw, widget.uncollected);
     if (journal == null) {
-      setState(() => _error = "That code wasn't recognized. Check it and try again.");
+      setState(() => _error = "That code isn't on this expedition's map. Check the marker and try again.");
       return;
     }
 
