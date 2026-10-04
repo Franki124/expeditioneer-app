@@ -7,6 +7,7 @@ import '../../../core/widgets/petal_field.dart';
 import '../../../theme/colors.dart';
 import '../../../theme/spacing.dart';
 import '../../../theme/typography.dart';
+import '../../legal/privacy_notice.dart';
 import '../cubit/auth_cubit.dart';
 import '../cubit/auth_state.dart';
 
@@ -101,8 +102,12 @@ class LoginScreen extends StatelessWidget {
                         children: [
                           AppButton(
                             label: 'Continue with Google',
-                            onPressed: () =>
-                                context.read<AuthCubit>().signInWithGoogle(),
+                            onPressed: () async {
+                              if (!await confirmGooglePrivacyNotice(context)) return;
+                              if (context.mounted) {
+                                await context.read<AuthCubit>().signInWithGoogle();
+                              }
+                            },
                           ),
                           const SizedBox(height: AppSpacing.sm12),
                           TextButton(

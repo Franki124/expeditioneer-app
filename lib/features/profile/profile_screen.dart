@@ -12,6 +12,7 @@ import '../auth/cubit/auth_state.dart';
 import '../auth/data/auth_repository.dart';
 import '../auth/domain/app_user.dart';
 import '../events/cubit/joined_event_cubit.dart';
+import '../legal/privacy_notice.dart';
 import '../events/cubit/joined_event_state.dart';
 import '../events/data/event_repository.dart';
 import '../events/domain/event.dart';
@@ -101,11 +102,16 @@ class _ProfileView extends StatelessWidget {
       case _SignOutAction.signOutAnyway:
         await context.read<AuthCubit>().signOut();
       case _SignOutAction.linkGoogle:
-        await context.read<AuthCubit>().linkGoogleAccount();
+        await _linkGoogle(context);
       case _SignOutAction.cancel:
       case null:
         break;
     }
+  }
+
+  Future<void> _linkGoogle(BuildContext context) async {
+    if (!await confirmGooglePrivacyNotice(context)) return;
+    if (context.mounted) await context.read<AuthCubit>().linkGoogleAccount();
   }
 
   @override
@@ -225,7 +231,32 @@ class _ProfileView extends StatelessWidget {
                           const SizedBox(height: AppSpacing.sm12),
                           AppButton(
                             label: 'Continue with Google',
-                            onPressed: () => context.read<AuthCubit>().linkGoogleAccount(),
+                            onPressed: () => _linkGoogle(context),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                  if (user?.authProvider == 'google') ...[
+                    const SizedBox(height: AppSpacing.lg32),
+                    AppCard(
+                      padding: const EdgeInsets.all(AppSpacing.md20),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            PrivacyNotice.title,
+                            style: AppTypography.body(fontWeight: FontWeight.w700),
+                          ),
+                          const SizedBox(height: AppSpacing.xs4),
+                          Text(
+                            PrivacyNotice.profileNote,
+                            style: AppTypography.body(color: AppColors.creamDim, fontSize: 15),
+                          ),
+                          TextButton(
+                            style: TextButton.styleFrom(padding: EdgeInsets.zero),
+                            onPressed: () => showPrivacyNoticeDetails(context),
+                            child: const Text('Klauzula informacyjna RODO'),
                           ),
                         ],
                       ),
