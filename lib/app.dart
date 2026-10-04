@@ -86,11 +86,18 @@ class _ExpeditioneerAppState extends State<ExpeditioneerApp> {
           scrollBehavior: AppScrollBehavior(),
           routerConfig: _router,
           builder: (context, child) {
-            final content = Stack(
-              children: [
-                ?child,
-                const OfflineOverlay(),
-              ],
+            // Browsers that pass the phone's font size through to web pages
+            // (e.g. DuckDuckGo) make Flutter web scale every text style, which
+            // breaks fixed layouts like the bottom nav. Cap it so large
+            // system text still grows, but not past what the layouts fit.
+            final content = MediaQuery.withClampedTextScaling(
+              maxScaleFactor: 1.2,
+              child: Stack(
+                children: [
+                  ?child,
+                  const OfflineOverlay(),
+                ],
+              ),
             );
             if (!kIsWeb) return content;
             final isDesktop = MediaQuery.sizeOf(context).width >= AppBreakpoints.desktop;
