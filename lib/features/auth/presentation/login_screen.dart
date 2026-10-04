@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../core/feature_flags.dart';
 import '../../../core/widgets/app_button.dart';
 import '../../../core/widgets/motion.dart';
 import '../../../core/widgets/petal_field.dart';
@@ -99,22 +100,30 @@ class LoginScreen extends StatelessWidget {
                       ),
                       Column(
                         children: [
-                          AppButton(
-                            label: 'Continue with Google',
-                            onPressed: () =>
-                                context.read<AuthCubit>().signInWithGoogle(),
-                          ),
-                          const SizedBox(height: AppSpacing.sm12),
-                          TextButton(
-                            onPressed: () => _promptGuestName(context),
-                            child: Text(
-                              'continue as a guest',
-                              style: AppTypography.label(
-                                fontSize: 15,
-                                color: AppColors.creamDim,
-                              ),
+                          if (FeatureFlags.googleSignInEnabled) ...[
+                            AppButton(
+                              label: 'Continue with Google',
+                              onPressed: () =>
+                                  context.read<AuthCubit>().signInWithGoogle(),
                             ),
-                          ),
+                            const SizedBox(height: AppSpacing.sm12),
+                          ],
+                          if (FeatureFlags.googleSignInEnabled)
+                            TextButton(
+                              onPressed: () => _promptGuestName(context),
+                              child: Text(
+                                'continue as a guest',
+                                style: AppTypography.label(
+                                  fontSize: 15,
+                                  color: AppColors.creamDim,
+                                ),
+                              ),
+                            )
+                          else
+                            AppButton(
+                              label: 'Continue as a guest',
+                              onPressed: () => _promptGuestName(context),
+                            ),
                         ],
                       ),
                     ],
