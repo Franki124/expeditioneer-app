@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../core/feature_flags.dart';
 import '../../core/widgets/app_button.dart';
 import '../../core/widgets/app_card.dart';
 import '../../core/widgets/motion.dart';
@@ -35,9 +36,11 @@ class ProfileScreen extends StatelessWidget {
 class _ProfileView extends StatelessWidget {
   const _ProfileView();
 
-  static const _guestProgressWarning =
-      "You're playing as a guest. If you sign out without linking an account first, "
-      "you won't be able to get back into this progress — guest sessions can't be recovered.";
+  static const _guestProgressWarning = FeatureFlags.googleSignInEnabled
+      ? "You're playing as a guest. If you sign out without linking an account first, "
+          "you won't be able to get back into this progress — guest sessions can't be recovered."
+      : "You're playing as a guest. If you sign out, you won't be able to get back "
+          "into this progress — guest sessions can't be recovered.";
 
   Future<void> _confirmLeaveEvent(BuildContext context, {required bool isGuest}) async {
     final confirmed = await showAppDialog<bool>(
@@ -88,11 +91,12 @@ class _ProfileView extends StatelessWidget {
             onPressed: () => Navigator.of(dialogContext).pop(_SignOutAction.signOutAnyway),
             child: Text('Sign out anyway', style: AppTypography.body(color: AppColors.danger)),
           ),
-          AppButton(
-            label: 'Sign in with Google first',
-            expand: false,
-            onPressed: () => Navigator.of(dialogContext).pop(_SignOutAction.linkGoogle),
-          ),
+          if (FeatureFlags.googleSignInEnabled)
+            AppButton(
+              label: 'Sign in with Google first',
+              expand: false,
+              onPressed: () => Navigator.of(dialogContext).pop(_SignOutAction.linkGoogle),
+            ),
         ],
       ),
     );
@@ -205,7 +209,7 @@ class _ProfileView extends StatelessWidget {
                       );
                     },
                   ),
-                  if (isGuest) ...[
+                  if (isGuest && FeatureFlags.googleSignInEnabled) ...[
                     const SizedBox(height: AppSpacing.lg32),
                     AppCard(
                       padding: const EdgeInsets.all(AppSpacing.md20),
