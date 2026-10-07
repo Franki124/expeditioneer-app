@@ -3,7 +3,6 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../../../core/utils/cloudinary_image.dart';
 import '../../../core/widgets/app_button.dart';
 import '../../../core/widgets/app_card.dart';
 import '../../../core/widgets/diamond_marker.dart';
@@ -11,6 +10,7 @@ import '../../../theme/colors.dart';
 import '../../../theme/radii.dart';
 import '../../../theme/spacing.dart';
 import '../../../theme/typography.dart';
+import '../../event_pack/widgets/pack_image.dart';
 import '../../events/data/journal_repository.dart';
 import '../../events/data/participant_repository.dart';
 import '../../events/domain/journal.dart';
@@ -145,11 +145,10 @@ class _QuizFlowScreenState extends State<_QuizFlowScreen> {
     await context.read<ParticipantRepository>().submitQuizAnswer(
           eventId: widget.eventId,
           uid: widget.uid,
-          journalId: widget.journal.id,
-          questionDocId: question.id,
+          journal: widget.journal,
+          question: question,
           selectedOptionIds: selectedOptionIds,
           isCorrect: isCorrect,
-          points: question.points,
         );
     if (!mounted) return;
     setState(() {
@@ -208,6 +207,8 @@ class _QuizFlowScreenState extends State<_QuizFlowScreen> {
       body: SafeArea(
         child: questions == null
             ? const Center(child: CircularProgressIndicator())
+            : questions.isEmpty
+            ? const _QuizNotDownloaded()
             : PageView(
                 controller: _pageController,
                 physics: const NeverScrollableScrollPhysics(),
@@ -246,6 +247,43 @@ class _QuizFlowScreenState extends State<_QuizFlowScreen> {
     final minutes = s ~/ 60;
     final secs = s % 60;
     return '$minutes:${secs.toString().padLeft(2, '0')}';
+  }
+}
+
+/// No questions on the device and no signal to fetch them — only happens if
+/// the event pack never finished downloading this quiz.
+class _QuizNotDownloaded extends StatelessWidget {
+  const _QuizNotDownloaded();
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(AppSpacing.lg32),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          const DiamondMarker(
+            size: 88,
+            glow: true,
+            child: Icon(Icons.cloud_off_outlined, color: AppColors.gold, size: 34),
+          ),
+          const SizedBox(height: AppSpacing.lg32),
+          Text(
+            "This quiz isn't on your phone yet",
+            style: AppTypography.display(fontSize: 22),
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: AppSpacing.sm12),
+          Text(
+            "Come back to it when you have signal. You've found it, so it will be waiting for you.",
+            style: AppTypography.body(color: AppColors.creamDim),
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: AppSpacing.lg32),
+          AppButton(label: 'Back', onPressed: () => Navigator.of(context).pop(false)),
+        ],
+      ),
+    );
   }
 }
 
@@ -409,15 +447,7 @@ class _QuestionPageState extends State<_QuestionPage> {
           if (question.imageUrl.isNotEmpty) ...[
             AspectRatio(
               aspectRatio: 4 / 3,
-              child: ColoredBox(
-                color: AppColors.navyPanel,
-                child: Image.network(
-                  cloudinaryDeliveryUrl(question.imageUrl),
-                  width: double.infinity,
-                  fit: BoxFit.contain,
-                  errorBuilder: (context, error, stackTrace) => Container(color: AppColors.navyPanel),
-                ),
-              ),
+              child: PackImage(url: question.imageUrl),
             ),
             const SizedBox(height: AppSpacing.sm12),
           ],

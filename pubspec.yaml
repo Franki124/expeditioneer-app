@@ -48,6 +48,9 @@ dependencies:
   provider: ^6.1.5+1
   mobile_scanner: ^7.4.0
   permission_handler: ^13.0.1
+  path_provider: ^2.1.5
+  http: ^1.6.0
+  crypto: ^3.0.7
 
 dev_dependencies:
   flutter_test:
@@ -70,6 +73,12 @@ flutter:
   # included with your application, so that you can use the icons in
   # the material Icons class.
   uses-material-design: true
+
+  # Fonts are bundled so the app looks right with no signal on first launch;
+  # google_fonts picks up these files by name instead of downloading them.
+  assets:
+    - assets/google_fonts/
+    - assets/licenses/
 
   # To add assets to your application, add an assets section, like this:
   # assets:

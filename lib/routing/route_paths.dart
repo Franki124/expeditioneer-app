@@ -8,4 +8,5 @@ class RoutePaths {
   static const leaderboard = '/leaderboard';
   static const profile = '/profile';
   static const scan = '/scan';
+  static const eventPack = '/event-pack';
 }

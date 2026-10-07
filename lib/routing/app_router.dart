@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../features/auth/cubit/auth_cubit.dart';
 import '../features/auth/cubit/auth_state.dart';
 import '../features/auth/presentation/login_screen.dart';
+import '../features/event_pack/presentation/event_pack_screen.dart';
 import '../features/home/home_screen.dart';
 import '../features/journal/journal_screen.dart';
 import '../features/leaderboard/leaderboard_screen.dart';
@@ -62,6 +63,11 @@ class AppRouter {
           path: RoutePaths.scan,
           parentNavigatorKey: rootNavigatorKey,
           builder: (context, state) => const ScanScreen(),
+        ),
+        GoRoute(
+          path: RoutePaths.eventPack,
+          parentNavigatorKey: rootNavigatorKey,
+          builder: (context, state) => const EventPackScreen(),
         ),
         StatefulShellRoute.indexedStack(
           builder: (context, state, navigationShell) =>

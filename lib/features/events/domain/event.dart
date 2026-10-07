@@ -11,6 +11,7 @@ class Event {
     required this.status,
     required this.journalCount,
     this.maxParticipants,
+    this.contentVersion = 0,
   });
 
   final String id;
@@ -22,6 +23,10 @@ class Event {
   final String status; // draft | live | closed | archived
   final int journalCount;
   final int? maxParticipants;
+
+  /// Bumped by the admin console whenever a quest, quiz question or image
+  /// changes, so a player's downloaded event pack knows to refresh.
+  final int contentVersion;
 
   bool get isLive => status == 'live';
 
@@ -37,6 +42,7 @@ class Event {
       status: data['status'] as String? ?? 'draft',
       journalCount: (data['journalCount'] as num?)?.toInt() ?? 0,
       maxParticipants: (data['maxParticipants'] as num?)?.toInt(),
+      contentVersion: (data['contentVersion'] as num?)?.toInt() ?? 0,
     );
   }
 }

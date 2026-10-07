@@ -2,12 +2,12 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 
+import '../../features/event_pack/widgets/pack_image.dart';
 import '../../features/events/domain/journal.dart';
 import '../../theme/breakpoints.dart';
 import '../../theme/colors.dart';
 import '../../theme/spacing.dart';
 import '../../theme/typography.dart';
-import '../utils/cloudinary_image.dart';
 import 'app_button.dart';
 import 'corner_frame.dart';
 
@@ -90,17 +90,7 @@ class _RevealModalState extends State<RevealModal> with SingleTickerProviderStat
                     aspectRatio: 4 / 3,
                     child: widget.journal.artUrl.isEmpty
                         ? _ArtPlaceholder(tag: tag)
-                        : ColoredBox(
-                            color: AppColors.navyPanel,
-                            child: Image.network(
-                              cloudinaryDeliveryUrl(widget.journal.artUrl),
-                              width: double.infinity,
-                              fit: BoxFit.contain,
-                              errorBuilder: (context, error, stackTrace) => _ArtPlaceholder(tag: tag),
-                              loadingBuilder: (context, child, progress) =>
-                                  progress == null ? child : _ArtPlaceholder(tag: tag),
-                            ),
-                          ),
+                        : PackImage(url: widget.journal.artUrl, label: tag),
                   ),
                   const SizedBox(height: AppSpacing.sm12),
                   Text(tag, style: AppTypography.label(fontSize: 13)),
