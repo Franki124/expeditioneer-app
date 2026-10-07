@@ -88,7 +88,7 @@ Future<QuestFindOutcome> completeQuestFind({
     await context.read<ParticipantRepository>().recordScan(
           eventId: eventId,
           uid: uid,
-          journalId: journal.id,
+          journal: journal,
         );
   } catch (_) {
     return QuestFindOutcome.error;

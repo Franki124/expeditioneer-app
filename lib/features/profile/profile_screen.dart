@@ -14,6 +14,7 @@ import '../auth/domain/app_user.dart';
 import '../events/cubit/joined_event_cubit.dart';
 import '../events/cubit/joined_event_state.dart';
 import '../events/data/event_repository.dart';
+import '../events/data/participant_repository.dart';
 import '../events/domain/event.dart';
 import 'cubit/profile_settings_cubit.dart';
 import 'cubit/profile_settings_state.dart';
@@ -69,6 +70,26 @@ class _ProfileView extends StatelessWidget {
   }
 
   Future<void> _confirmSignOut(BuildContext context, {required bool isGuest}) async {
+    // A guest who signs out can never sign back in to that account, so
+    // finds still queued on the device would never reach the server.
+    if (isGuest && await context.read<ParticipantRepository>().hasUnsyncedWrites()) {
+      if (!context.mounted) return;
+      await showAppDialog<void>(
+        context: context,
+        builder: (dialogContext) => AlertDialog(
+          backgroundColor: AppColors.navyPanel2,
+          title: Text('Finds still syncing', style: AppTypography.body(fontWeight: FontWeight.w700)),
+          content: Text(
+            "Some of your finds haven't reached the server yet. Connect to the internet "
+            'and wait a moment before signing out, or they will be lost.',
+            style: AppTypography.body(color: AppColors.creamDim),
+          ),
+          actions: [TextButton(onPressed: () => Navigator.of(dialogContext).pop(), child: const Text('OK'))],
+        ),
+      );
+      return;
+    }
+    if (!context.mounted) return;
     if (!isGuest) {
       await context.read<AuthCubit>().signOut();
       return;

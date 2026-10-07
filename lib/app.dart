@@ -6,6 +6,9 @@ import 'package:go_router/go_router.dart';
 import 'core/utils/connectivity_cubit.dart';
 import 'core/widgets/offline_overlay.dart';
 import 'features/auth/cubit/auth_cubit.dart';
+import 'features/event_pack/cubit/event_pack_cubit.dart';
+import 'features/event_pack/data/event_pack_repository.dart';
+import 'features/event_pack/data/pack_file_store.dart';
 import 'features/auth/data/auth_repository.dart';
 import 'features/events/cubit/joined_event_cubit.dart';
 import 'features/events/data/event_repository.dart';
@@ -19,7 +22,9 @@ import 'theme/breakpoints.dart';
 import 'theme/colors.dart';
 
 class ExpeditioneerApp extends StatefulWidget {
-  const ExpeditioneerApp({super.key});
+  const ExpeditioneerApp({super.key, required this.packFileStore});
+
+  final PackFileStore packFileStore;
 
   @override
   State<ExpeditioneerApp> createState() => _ExpeditioneerAppState();
@@ -34,6 +39,7 @@ class _ExpeditioneerAppState extends State<ExpeditioneerApp> {
   late final JoinedEventCubit _joinedEventCubit;
   late final OnboardingCubit _onboardingCubit;
   late final ConnectivityCubit _connectivityCubit;
+  late final EventPackCubit _eventPackCubit;
   late final GoRouter _router;
 
   @override
@@ -51,6 +57,13 @@ class _ExpeditioneerAppState extends State<ExpeditioneerApp> {
     );
     _onboardingCubit = OnboardingCubit();
     _connectivityCubit = ConnectivityCubit();
+    _eventPackCubit = EventPackCubit(
+      repository: EventPackRepository(),
+      fileStore: widget.packFileStore,
+      eventRepository: _eventRepository,
+      joinedEventCubit: _joinedEventCubit,
+      connectivityCubit: _connectivityCubit,
+    );
     _router = AppRouter.build(_authCubit, _onboardingCubit);
   }
 
@@ -60,6 +73,7 @@ class _ExpeditioneerAppState extends State<ExpeditioneerApp> {
     _joinedEventCubit.close();
     _onboardingCubit.close();
     _connectivityCubit.close();
+    _eventPackCubit.close();
     super.dispose();
   }
 
@@ -71,6 +85,7 @@ class _ExpeditioneerAppState extends State<ExpeditioneerApp> {
         RepositoryProvider.value(value: _eventRepository),
         RepositoryProvider.value(value: _journalRepository),
         RepositoryProvider.value(value: _participantRepository),
+        RepositoryProvider.value(value: widget.packFileStore),
       ],
       child: MultiBlocProvider(
         providers: [
@@ -78,6 +93,7 @@ class _ExpeditioneerAppState extends State<ExpeditioneerApp> {
           BlocProvider.value(value: _joinedEventCubit),
           BlocProvider.value(value: _onboardingCubit),
           BlocProvider.value(value: _connectivityCubit),
+          BlocProvider.value(value: _eventPackCubit),
         ],
         child: MaterialApp.router(
           title: 'Expedition Journal',

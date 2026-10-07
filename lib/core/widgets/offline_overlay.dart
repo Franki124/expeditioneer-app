@@ -33,7 +33,7 @@ class OfflineOverlay extends StatelessWidget {
               ),
               color: AppColors.error,
               child: Text(
-                "You're offline — some features may not work.",
+                "You're offline. Anything you find is saved and will sync later.",
                 textAlign: TextAlign.center,
                 style: AppTypography.body(fontWeight: FontWeight.w700, color: AppColors.navyDeep),
               ),

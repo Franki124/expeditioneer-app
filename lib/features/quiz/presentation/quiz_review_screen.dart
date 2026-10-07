@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../../../core/utils/cloudinary_image.dart';
 import '../../../core/widgets/app_card.dart';
 import '../../../core/widgets/motion.dart';
 import '../../../theme/colors.dart';
 import '../../../theme/spacing.dart';
 import '../../../theme/typography.dart';
+import '../../event_pack/widgets/pack_image.dart';
 import '../../events/data/journal_repository.dart';
 import '../../events/data/participant_repository.dart';
 import '../../events/domain/journal.dart';
@@ -111,15 +111,7 @@ class _ReviewQuestionCard extends StatelessWidget {
           if (question.imageUrl.isNotEmpty) ...[
             AspectRatio(
               aspectRatio: 4 / 3,
-              child: ColoredBox(
-                color: AppColors.navyPanel2,
-                child: Image.network(
-                  cloudinaryDeliveryUrl(question.imageUrl),
-                  width: double.infinity,
-                  fit: BoxFit.contain,
-                  errorBuilder: (context, error, stackTrace) => Container(color: AppColors.navyPanel2),
-                ),
-              ),
+              child: PackImage(url: question.imageUrl, backgroundColor: AppColors.navyPanel2),
             ),
             const SizedBox(height: AppSpacing.sm12),
           ],

@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../core/utils/upper_case_text_formatter.dart';
 import '../../../core/widgets/app_button.dart';
 import '../../../core/widgets/motion.dart';
+import '../../../routing/route_paths.dart';
 import '../../../theme/colors.dart';
 import '../../../theme/spacing.dart';
 import '../../../theme/typography.dart';
@@ -136,6 +138,7 @@ class _JoinCodeFieldState extends State<JoinCodeField> {
       listener: (context, state) {
         if (state.joinCodeStatus == JoinCodeStatus.success) {
           _controller.clear();
+          context.push(RoutePaths.eventPack);
           return;
         }
         if (state.joinCodeStatus == JoinCodeStatus.nameTaken) {

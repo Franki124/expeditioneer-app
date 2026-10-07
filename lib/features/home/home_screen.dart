@@ -15,6 +15,7 @@ import '../../theme/typography.dart';
 import '../auth/cubit/auth_cubit.dart';
 import '../auth/data/auth_repository.dart';
 import '../auth/domain/app_user.dart';
+import '../event_pack/widgets/offline_status_row.dart';
 import '../events/cubit/joined_event_cubit.dart';
 import '../events/cubit/joined_event_state.dart';
 import '../events/data/event_repository.dart';
@@ -165,6 +166,7 @@ class _JoinedEventSectionState extends State<_JoinedEventSection> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       JoinedEventCard(event: event, collectedCount: collected),
+                      OfflineStatusRow(eventId: joinedEventId, uid: widget.uid),
                       if (!isDesktopWeb) ...[
                         const SizedBox(height: AppSpacing.sm12),
                         AppButton(
