@@ -12,6 +12,7 @@ import '../../../theme/typography.dart';
 import '../../auth/cubit/auth_cubit.dart';
 import '../../events/cubit/joined_event_cubit.dart';
 import '../../events/cubit/joined_event_state.dart';
+import 'active_events_box.dart';
 
 class JoinCodeField extends StatefulWidget {
   const JoinCodeField({super.key, required this.displayName});
@@ -25,6 +26,7 @@ class JoinCodeField extends StatefulWidget {
 class _JoinCodeFieldState extends State<JoinCodeField> {
   final _controller = TextEditingController();
   String _lastAttemptedName = '';
+  String _lastAttemptedCode = '';
 
   @override
   void dispose() {
@@ -32,13 +34,17 @@ class _JoinCodeFieldState extends State<JoinCodeField> {
     super.dispose();
   }
 
-  void _submit(BuildContext context, {String? displayName}) {
+  /// [code] defaults to the text field; the "Happening now" box passes the
+  /// live event's code directly. Remembered so the name-taken retry re-joins
+  /// the same event whichever way it was started.
+  void _submit(BuildContext context, {String? code, String? displayName}) {
     final uid = context.read<AuthCubit>().state.user?.uid;
     if (uid == null) return;
     final name = displayName ?? widget.displayName;
     _lastAttemptedName = name;
+    _lastAttemptedCode = code ?? _controller.text;
     context.read<JoinedEventCubit>().submitJoinCode(
-          _controller.text,
+          _lastAttemptedCode,
           uid: uid,
           displayName: name,
         );
@@ -121,7 +127,7 @@ class _JoinCodeFieldState extends State<JoinCodeField> {
               if (newName.isEmpty) return;
               retried = true;
               Navigator.of(dialogContext).pop();
-              _submit(context, displayName: newName);
+              _submit(context, code: _lastAttemptedCode, displayName: newName);
             },
           ),
         ],
@@ -150,9 +156,14 @@ class _JoinCodeFieldState extends State<JoinCodeField> {
       },
       builder: (context, state) {
         final validating = state.joinCodeStatus == JoinCodeStatus.validating;
+        final validatingTyped = validating && _lastAttemptedCode == _controller.text;
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            ActiveEventsBox(
+              joiningEventCode: validating && !validatingTyped ? _lastAttemptedCode : null,
+              onJoin: (event) => _submit(context, code: event.joinCode),
+            ),
             Text('Join a different event', style: AppTypography.body(fontWeight: FontWeight.w700)),
             const SizedBox(height: AppSpacing.xs8),
             Row(
@@ -174,7 +185,7 @@ class _JoinCodeFieldState extends State<JoinCodeField> {
                 const SizedBox(width: AppSpacing.xs8),
                 IconButton(
                   onPressed: validating ? null : () => _submit(context),
-                  icon: validating
+                  icon: validatingTyped
                       ? const SizedBox(
                           width: 18,
                           height: 18,

@@ -18,6 +18,16 @@ class EventRepository {
     return Event.fromDoc(query.docs.first);
   }
 
+  /// Every event an admin has activated, for the "Happening now" box on the
+  /// join screen. Single-field equality, so no composite index is needed.
+  Stream<List<Event>> watchLiveEvents() {
+    return _events
+        .where('status', isEqualTo: 'live')
+        .snapshots()
+        .map((query) => query.docs.map(Event.fromDoc).toList()
+          ..sort((a, b) => a.startAt.compareTo(b.startAt)));
+  }
+
   Stream<Event?> watchEvent(String eventId) {
     return _events
         .doc(eventId)
